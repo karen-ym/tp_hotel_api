@@ -1,4 +1,4 @@
-from app import db
+from dependencias import db
 
 class Habitacion(db.Model):
     __tablename__ = "habitaciones"
