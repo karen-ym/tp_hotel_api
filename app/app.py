@@ -3,6 +3,9 @@ from src.routes.auth_bp import auth_bp
 from src.routes.habitaciones_bp import habitaciones_bp
 
 app = Flask(__name__)
+
+app.config["SECRET_KEY"] = "pass1234"  # Clave secreta para JWT (debería estar en una variable de entorno? chequear despues)
+
 app.register_blueprint(auth_bp) # Registrar el blueprint
 app.register_blueprint(habitaciones_bp)
 
