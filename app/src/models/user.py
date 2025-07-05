@@ -1,4 +1,4 @@
-from app.app import db
+from dependencias import db
 
 class User(db.Model):
   __tablename__ = 'users'
