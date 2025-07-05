@@ -10,6 +10,7 @@ from src.security.security import hash_password, check_password, token_required
 # Iniciar el blue print
 auth_bp = Blueprint('auth', __name__)  # (nombreDelBlueprint, nombreParaFlask)
 
+# ———LOGIN ———
 @auth_bp.route("/login", methods=["POST"])
 def login():
   # Acá va la lógica JWT y tema tokens
@@ -20,31 +21,24 @@ def login():
   username = data.get('usuario')
   password = data.get('clave')
 
-  # -Simulación de base de datos-
-  users = {
-        "empleado1": {"password": "123", "role": "Empleado"},
-        "cliente1": {"password": "456", "role": "Cliente"}
-    }
-  
-  user_info = users.get(username)
+  user_db = User.query.filter_by(username=username).first()
 
-  # Usuario ? ∃ // contraseña ? ∃
-  if user_info and user_info["password"] == password:
+  if user_db and check_password(user_db.password, password):
     token = jwt.encode({
-        'sub': username, # Identificador del usuario (subject)
-        'role': user_info['role'], 
+        'sub': user_db.username,  # Identificador del usuario (subject)
+        'role': user_db.role, 
         'exp': datetime.now(timezone.utc) + timedelta(minutes=30)
     }, current_app.config['SECRET_KEY'], algorithm="HS256")
 
     return jsonify({
         "token": token,
-        "categoria": user_info['role']
+        "categoria": user_db.role
     }), 200
   else:
-    return jsonify({"message": "Credenciales invalidas"}), 401
+    return jsonify({"message": "Credenciales inválidas"}), 401
 
 
-
+# ——— REGISTRO ———
 @auth_bp.route("/registro", methods=["POST"])
 def registro():
   data = request.get_json()
