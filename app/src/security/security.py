@@ -1,6 +1,9 @@
 from functools import wraps
 from flask import request, jsonify, current_app
 import jwt
+import hashlib
+import os
+import hmac
 
 # Constructor de decoradores (pedido por el profesor)
 def token_required(role_required):
@@ -41,3 +44,21 @@ def token_required(role_required):
             return f(current_user, *args, **kwargs)
         return wrapper
     return decorator
+
+# ——— hashing de contraseñas ———
+
+def hash_password(password):
+  salt = os.urandom(16)  # Genera un salt aleatorio de 16 bytes
+  pwd_hash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000) # 'sha256' = algoritmo de hash
+  storage = salt.hex() + ':' + pwd_hash.hex()
+  return storage
+
+def check_password(stored_password, provided_password):
+  try:
+    salt_hex, hash_hex = stored_password.split(':')
+    salt = bytes.fromhex(salt_hex)
+  except ValueError:
+    return False
+  
+  pwd_hash = hashlib.pbkdf2_hmac('sha256', provided_password.encode('utf-8'), salt, 100000) # se hashea de igual manera (idem salt)
+  return hmac.compare_digest(pwd_hash, bytes.fromhex(hash_hex)) #compara los dos hashes 
