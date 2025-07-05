@@ -10,7 +10,7 @@ class UserSchema(ma.Schema):
   )
   categoria = fields.Str(
     required=True,
-    validate=validate.OneOf(["Cliente", "Empleado"], error="La categoría debe ser 'Cliente' o 'Empleado'."),
+    validate=validate.OneOf(["cliente", "empleado"], error="La categoría debe ser 'Cliente' o 'Empleado'."),
     error_messages={"required": "La categoría es obligatoria."}
   )
   clave1 = fields.Str(
