@@ -10,8 +10,12 @@ def create_app():
   app = Flask(__name__)
   app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
-  app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://nombreUsuario:clave@host.docker.internal:5432/hotel_api_db' # -> COMPLETAR CON LOS DATOS DE LA DB DE USTDS (hotel_api_db es el nombre de la db, llamenla así.)
+  # 1. EJECUTAR PARA CREAR DB
+  #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://usuarioNombre:clave@localhost:5432/hotel_api_db' #Con credenciales correctas
+  # 2. EJECUTAR PARA CONECTAR A DB con Docker
+  #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://usuarioNombre:clave@host.docker.internal:5432/hotel_api_db' 
   app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 
 
   from src.models.user import User
