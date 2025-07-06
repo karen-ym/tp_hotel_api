@@ -59,6 +59,8 @@ Buscar en app.py esta línea de código y completar con los valores de su db pga
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://nombreUsuario:clave@localhost:5432/hotel_api_db'
 ```
 
+### ES NECESARIO PRIMERO EJECUTARLO CON FLASK PARA CREAR LA DATABASE, LUEGO CON DOCKER PARA LA CORRER LA APP.
+
 ## Configuración de Entorno
 
 Este proyecto utiliza variables de entorno para manejar claves secretas.
@@ -80,7 +82,7 @@ Este es el método recomendado y obligatorio. Utiliza Gunicorn dentro de un cont
 **b. Configurar la Conexión a la Base de Datos**
 
 - Abre el archivo `app/app.py`.
-- Busca la línea de `SQLALCHEMY_DATABASE_URI`.
+- Busca la línea de `SQLALCHEMY_DATABASE_URI` (la que contiene host.docker.internal).
 - Reemplaza con tus credenciales de PostgreSQL.
 
 **c. Construir la Imagen Docker**
