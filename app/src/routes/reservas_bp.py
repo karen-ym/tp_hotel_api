@@ -12,7 +12,7 @@ reservas_bp = Blueprint("reservas_bp", __name__)
 # Endpoints Clientes: Reserva un rango de fechas, ve habitaciones disponibles, ve estado de habitaciones en un día, y busca por precio 
 # Endpoint 1:
 @reservas_bp.route("/reservar", methods=["POST"])
-@token_required("Cliente")
+@token_required("cliente")
 def reservar(current_user):
     data = request.get_json()
     habitacion_id = data["habitacion_id"]
@@ -37,7 +37,7 @@ def reservar(current_user):
 
 # Endpoint 2:
 @reservas_bp.route("/disponibles", methods=["GET"])
-@token_required("Cliente")
+@token_required("cliente")
 def disponibles_rango(current_user):
     inicio = datetime.strptime(request.args.get("inicio"), "%Y-%m-%d")
     fin = datetime.strptime(request.args.get("fin"), "%Y-%m-%d")
@@ -61,7 +61,7 @@ def disponibles_rango(current_user):
 
 # Endpoint 3:
 @reservas_bp.route("/estado-dia", methods=["GET"])
-@token_required("Cliente")
+@token_required("cliente")
 def estado_dia(current_user):
     fecha = datetime.strptime(request.args.get("fecha"), "%Y-%m-%d").date()
     habitaciones = Habitacion.query.all()
@@ -79,7 +79,7 @@ def estado_dia(current_user):
 
 # Endpoint 4:
 @reservas_bp.route("/precio-menor", methods=["GET"])
-@token_required("Cliente")
+@token_required("cliente")
 def buscar_por_precio(current_user):
     limite = float(request.args.get("limite"))
     habitaciones = Habitacion.query.filter(Habitacion.precio <= limite, Habitacion.estado == True).all()
@@ -89,7 +89,7 @@ def buscar_por_precio(current_user):
 # Endpoints Empleados: Crea reserva para un día específico y ve habitacion por número con reservas 
 #Endpoint 1:
 @reservas_bp.route("/reservar-dia", methods=["POST"])
-@token_required("Empleado")
+@token_required("cliente")
 def reservar_dia(current_user):
     data = request.get_json()
     fecha = datetime.strptime(data["fecha"], "%Y-%m-%d").date()
@@ -106,7 +106,7 @@ def reservar_dia(current_user):
 
 # Endpoint 2:
 @reservas_bp.route("/habitacion/<int:numero>", methods=["GET"])
-@token_required("Empleado")
+@token_required("cliente")
 def ver_habitacion(current_user, numero):
     habitacion = Habitacion.query.filter_by(numero=numero).first()
     if not habitacion:

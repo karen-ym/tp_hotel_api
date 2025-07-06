@@ -16,8 +16,8 @@ def listar():
     return jsonify({"habitaciones": habitaciones_dump})
 
 @habitaciones_bp.route("/habitaciones", methods=["POST"])
-@token_required("Empleado")
-def crear():
+@token_required("empleado")
+def crear(current_user):
     data = request.get_json()
     try:
         nueva = habitacion_schema.load(data)
@@ -29,8 +29,8 @@ def crear():
     return jsonify({"mensaje": "Se agrego correctamente"}), 201
 
 @habitaciones_bp.route("/habitaciones/<int:id>/precio", methods=["PUT"])
-@token_required("Empleado")
-def editar(id):
+@token_required("empleado")
+def editar(current_user,id):
     habitacion = Habitacion.query.get(id)
     if not habitacion:
         return jsonify({"mensaje": "No encontrada"}), 404
@@ -42,8 +42,8 @@ def editar(id):
     return jsonify({"mensaje": "Se actualizo correctamente"})
 
 @habitaciones_bp.route("/habitaciones/<int:id>", methods=["DELETE"])
-@token_required("Empleado")
-def desactivar(id):
+@token_required("empleado")
+def desactivar(current_user,id):
     habitacion = Habitacion.query.get(id)
     if not habitacion:
         return jsonify({"mensaje": "No encontrada"}), 404
@@ -52,8 +52,8 @@ def desactivar(id):
     return jsonify({"mensaje": "Desactivada"})
 
 @habitaciones_bp.route("/habitaciones/<int:id>", methods=['POST'])
-@token_required("Empleado")
-def activar(id):
+@token_required("empleado")
+def activar(current_user,id):
     habitacion = Habitacion.query.get(id)
     if not habitacion:
         return jsonify({"mensaje": "No encontrada"}), 404
@@ -63,8 +63,8 @@ def activar(id):
     return jsonify({"mensaje": "Activada"})
 
 @habitaciones_bp.route("/habitaciones/<int:id>", methods=['GET'])
-@token_required("Empleado")
-def info_habitacion(id):
+@token_required("empleado")
+def info_habitacion(current_user,id):
     habitacion = Habitacion.query.get(id)
     if not habitacion:
         return jsonify({"mensaje": "No encontrada"}), 404
