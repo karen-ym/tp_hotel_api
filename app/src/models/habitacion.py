@@ -7,7 +7,7 @@ class Habitacion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     numero = db.Column(db.Integer, nullable=False)
     precio = db.Column(db.Float, nullable=False)
-    estado = db.Column(db.Boolean, default=True)
+    activa = db.Column(db.Boolean, default=True)
 
     
     reservas = db.relationship('Reserva', back_populates='habitacion')

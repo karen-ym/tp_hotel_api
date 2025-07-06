@@ -11,3 +11,5 @@ class ReservaSchema(Schema):
     def validar_fecha(self, value):
         if not value:
             raise ValidationError("La fecha es requerida")
+
+reservas_Schema = ReservaSchema(many=True)

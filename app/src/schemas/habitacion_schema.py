@@ -22,7 +22,7 @@ class HabitacionSchema(SQLAlchemyAutoSchema):
         validate=validate.Range(min=0),
     )
 
-    estado = fields.Boolean(load_default=True) 
+    activa = fields.Boolean(load_default=True) 
 
 #Serializar y deserializar una sola habitación
 habitacion_schema = HabitacionSchema()

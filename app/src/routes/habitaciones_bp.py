@@ -4,6 +4,9 @@ from src.schemas.habitacion_schema import habitacion_schema, habitaciones_schema
 from src.security.security import token_required
 from marshmallow import ValidationError
 from dependencias import db
+from src.models.reserva import Reserva
+from src.schemas.reserva_schema import reservas_Schema
+
 
 habitaciones_bp = Blueprint("habitaciones_bp", __name__)
 
@@ -47,7 +50,7 @@ def desactivar(current_user,id):
     habitacion = Habitacion.query.get(id)
     if not habitacion:
         return jsonify({"mensaje": "No encontrada"}), 404
-    habitacion.estado = False
+    habitacion.activa = False
     db.session.commit()
     return jsonify({"mensaje": "Desactivada"})
 
@@ -58,7 +61,7 @@ def activar(current_user,id):
     if not habitacion:
         return jsonify({"mensaje": "No encontrada"}), 404
     
-    habitacion.estado = True
+    habitacion.activa = True
     db.session.commit()
     return jsonify({"mensaje": "Activada"})
 
@@ -68,5 +71,11 @@ def info_habitacion(current_user,id):
     habitacion = Habitacion.query.get(id)
     if not habitacion:
         return jsonify({"mensaje": "No encontrada"}), 404
-    #Falta agregar query de reservas
-    return None
+    reservas = Reserva.query.filter(habitacion.id==id).all()
+
+    habitacion_json = habitacion_schema.dump(habitacion)
+    reservas_json = reservas_Schema.dump(reservas)
+
+    habitacion_json["reservas"] = reservas_json
+    
+    return jsonify(habitacion_json)
