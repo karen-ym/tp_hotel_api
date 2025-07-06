@@ -24,23 +24,34 @@ def buscar_por_precio(current_user):
 @busqueda_bp.route("/habitaciones/diario", methods=["GET"])
 @token_required("empleado")
 def estado_dia(current_user):
-    try:
-        fecha = datetime.strptime(request.args.get("fecha"), "%d/%m/%Y").date()
-    except (TypeError, ValueError):
-        return jsonify({"mensaje": "Parámetro 'fecha' inválido"}), 400
+    fecha_str = request.args.get("fecha")
+    if not fecha_str:
+        return jsonify({"mensaje": "El parámetro 'fecha' es requerido"}), 400
 
-    habitaciones = Habitacion.query.all()
+    try:
+        fecha = datetime.strptime(fecha_str, "%d/%m/%Y").date()
+    except (TypeError, ValueError):
+        return jsonify({"mensaje": "Formato de fecha inválido. Usar DD/MM/YYYY"}), 400
+
+    habitaciones = Habitacion.query.filter_by(activa=True).all()
     resultados = []
 
     for h in habitaciones:
-        reservada = Reserva.query.filter_by(id=h.id, fecha=fecha).first() is not None
+        reservada = Reserva.query.filter(
+            Reserva.habitacion_id == h.id,
+            Reserva.inicio <= fecha,
+            Reserva.fin >= fecha
+        ).first() is not None
+
         resultados.append({
             "numero": h.numero,
             "estado": "ocupada" if reservada else "disponible"
         })
 
-    return jsonify({"cantidad": len(habitaciones),
-                    "habitaciones":resultados}), 200
+    return jsonify({
+        "cantidad": len(habitaciones),
+        "habitaciones": resultados
+    }), 200
 
 #Endpoint3: buscar habitaciones disponibles en un rango de fechas (Cliente)
 @busqueda_bp.route("/habitaciones/disponibles", methods=["GET"])
