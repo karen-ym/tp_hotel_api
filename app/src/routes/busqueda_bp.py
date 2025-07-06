@@ -16,13 +16,13 @@ def buscar_por_precio(current_user):
     except (TypeError, ValueError):
         return jsonify({"mensaje": "Parámetro 'precio' inválido"}), 400
 
-    habitaciones = Habitacion.query.filter(Habitacion.precio <= limite, Habitacion.estado == True).all()
+    habitaciones = Habitacion.query.filter(Habitacion.precio <= limite, Habitacion.activa == True).all()
     schema = HabitacionSchema(many=True)
     return jsonify(schema.dump(habitaciones)), 200
 
 #Endpoint2: ver estado de todas las habitaciones en una fecha (Cliente)
 @busqueda_bp.route("/habitaciones/diario", methods=["GET"])
-@token_required("cliente")
+@token_required("empleado")
 def estado_dia(current_user):
     try:
         fecha = datetime.strptime(request.args.get("fecha"), "%Y-%m-%d").date()
@@ -47,20 +47,21 @@ def estado_dia(current_user):
 @token_required("cliente")
 def disponibles_rango(current_user):
     try:
-        inicio = datetime.strptime(request.args.get("inicio"), "%Y-%m-%d")
-        fin = datetime.strptime(request.args.get("fin"), "%Y-%m-%d")
+        inicio = datetime.strptime(request.args.get("inicio"), "%d/%m/%Y")
+        fin = datetime.strptime(request.args.get("fin"), "%d/%m/%Y")
+
     except (TypeError, ValueError):
         return jsonify({"mensaje": "Fechas inválidas"}), 400
 
     if fin < inicio:
         return jsonify({"mensaje": "La fecha de fin no puede ser anterior a la de inicio"}), 400
 
-    habitaciones = Habitacion.query.filter_by(estado=True).all()
+    habitaciones = Habitacion.query.filter_by(activa=True).all()
     disponibles = []
 
     for h in habitaciones:
         ocupada = any(
-            Reserva.query.filter_by(habitacion_id=h.id, fecha=inicio + timedelta(days=i)).first()
+            Reserva.query.filter_by(id=h.id, fecha=inicio + timedelta(days=i)).first()
             for i in range((fin - inicio).days + 1)
         )
         if not ocupada:
