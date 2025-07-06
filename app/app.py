@@ -1,10 +1,14 @@
 from flask import Flask
 from dependencias import db, ma
+from dotenv import load_dotenv
+import os 
 
 def create_app():
 
+  load_dotenv()
+
   app = Flask(__name__)
-  app.config["SECRET_KEY"] = "pass1234"  # Clave secreta para JWT (debería estar en una variable de entorno? chequear despues)
+  app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
   app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://nombreUsuario:clave@localhost:5432/hotel_api_db' # -> COMPLETAR CON LOS DATOS DE LA DB DE USTDS (hotel_api_db es el nombre de la db, llamenla así.)
   app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
