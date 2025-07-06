@@ -21,11 +21,12 @@ def create_app():
   from src.routes.auth_bp import auth_bp
   from src.routes.habitaciones_bp import habitaciones_bp
   from src.routes.reservas_bp import reservas_bp
-  
+  from src.routes.busqueda_bp import busqueda_bp
 
   app.register_blueprint(auth_bp) # Registrar el blueprint
   app.register_blueprint(habitaciones_bp)
   app.register_blueprint(reservas_bp) 
+  app.register_blueprint(busqueda_bp)
   
   return app
 
