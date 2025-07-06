@@ -36,11 +36,11 @@ def estado_dia(current_user):
         reservada = Reserva.query.filter_by(id=h.id, fecha=fecha).first() is not None
         resultados.append({
             "numero": h.numero,
-            "precio": h.precio,
             "estado": "ocupada" if reservada else "disponible"
         })
 
-    return jsonify(resultados), 200
+    return jsonify({"cantidad": len(habitaciones),
+                    "habitaciones":resultados}), 200
 
 #Endpoint3: buscar habitaciones disponibles en un rango de fechas (Cliente)
 @busqueda_bp.route("/habitaciones/disponibles", methods=["GET"])
@@ -61,7 +61,7 @@ def disponibles_rango(current_user):
 
     for h in habitaciones:
         ocupada = any(
-            Reserva.query.filter_by(id=h.id, fecha=inicio + timedelta(days=i)).first()
+            Reserva.query.filter_by(id=h.id, inicio=inicio + timedelta(days=i)).first()
             for i in range((fin - inicio).days + 1)
         )
         if not ocupada:

@@ -6,6 +6,7 @@ from dependencias import db
 from src.security.security import token_required
 from src.models.habitacion import Habitacion
 from src.models.user import User
+from sqlalchemy.orm import joinedload
 
 reservas_bp = Blueprint("reservas_bp", __name__)
 
@@ -31,7 +32,7 @@ def crear_reserva(current_user):
     if fin < inicio:
         return jsonify({"mensaje": "La fecha de fin no puede ser anterior a la de inicio"}), 400
 
-    habitacion = Habitacion.query.get(habitacion_id)
+    habitacion = Habitacion.query.filter_by(numero=habitacion_id).first()
     if not habitacion or not habitacion.activa:
         return jsonify({"mensaje": "Habitación no válida o no disponible"}), 400
 
@@ -41,18 +42,23 @@ def crear_reserva(current_user):
     # Verificar disponibilidad en todas las fechas
     fechas_ocupadas = [
         fecha for fecha in fechas_reserva
-        if Reserva.query.filter_by(habitacion_id=habitacion_id, fecha=fecha).first()
+        if Reserva.query.filter_by(habitacion_id=habitacion_id, inicio=inicio).first()
     ]
     if fechas_ocupadas:
         fechas_str = ', '.join([f.strftime("%d/m/%Y") for f in fechas_ocupadas])
         return jsonify({"mensaje": f"La habitación ya está reservada en: {fechas_str}"}), 400
 
     # Crear reservas
-    reservas = [
-        Reserva(habitacion_id=habitacion_id, user_id=id_usuario, fecha=fecha)
-        for fecha in fechas_reserva
-    ]
-    db.session.add_all(reservas)
+    reserva = Reserva(
+        habitacion_id=habitacion.id,
+        user_id=id_usuario,
+        inicio=inicio,
+        fin=fin
+    )
+
+    
+
+    db.session.add(reserva)
     db.session.commit()
 
     return jsonify({"mensaje": "Reserva realizada con éxito"}), 201
@@ -63,6 +69,6 @@ def crear_reserva(current_user):
 @reservas_bp.route("/reservas", methods=["GET"])
 @token_required("empleado")
 def listar_reservas(current_user):
-    reservas = Reserva.query.all()
+    reservas = Reserva.query.options(joinedload(Reserva.habitacion)).all()
     schema = ReservaSchema(many=True)
     return jsonify(schema.dump(reservas)), 200
