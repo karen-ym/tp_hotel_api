@@ -9,7 +9,7 @@ reservas_bp = Blueprint("reservas_bp", __name__)
 
 #Endpoint1: alta de reserva por rango de fechas (Cliente)
 @reservas_bp.route("/reservas", methods=["POST"])
-@token_required("Cliente")
+@token_required("cliente")
 def crear_reserva(current_user):
     data = request.get_json()
     habitacion_id = data["habitacion_id"]
@@ -17,12 +17,12 @@ def crear_reserva(current_user):
     fin = datetime.strptime(data["fin"], "%Y-%m-%d")
 
     if fin < inicio:
-        return jsonify({"error": "La fecha de fin no puede ser anterior a la de inicio"}), 400
+        return jsonify({"mensaje": "La fecha de fin no puede ser anterior a la de inicio"}), 400
 
     for i in range((fin - inicio).days + 1):
         fecha = inicio + timedelta(days=i)
         if Reserva.query.filter_by(habitacion_id=habitacion_id, fecha=fecha).first():
-            return jsonify({"error": f"La habitación ya está reservada el {fecha.date()}"}), 400
+            return jsonify({"mensaje": f"La habitación ya está reservada el {fecha.date()}"}), 400
 
     for i in range((fin - inicio).days + 1):
         fecha = inicio + timedelta(days=i)
@@ -38,7 +38,7 @@ def crear_reserva(current_user):
 
 #Endpoint 2: listado de todas las reservas (Empleado)
 @reservas_bp.route("/reservas", methods=["GET"])
-@token_required("Empleado")
+@token_required("empleado")
 def listar_reservas(current_user):
     reservas = Reserva.query.all()
     schema = ReservaSchema(many=True)

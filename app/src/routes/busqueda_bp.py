@@ -9,12 +9,12 @@ busqueda_bp = Blueprint("busqueda_bp", __name__)
 
 #Endpoint: buscar habitaciones con precio menor al valor dado (Cliente)
 @busqueda_bp.route("/habitaciones/filtrar", methods=["GET"])
-@token_required("Cliente")
+@token_required("cliente")
 def buscar_por_precio(current_user):
     try:
         limite = float(request.args.get("precio"))
     except (TypeError, ValueError):
-        return jsonify({"error": "Parámetro 'precio' inválido"}), 400
+        return jsonify({"mensaje": "Parámetro 'precio' inválido"}), 400
 
     habitaciones = Habitacion.query.filter(Habitacion.precio <= limite, Habitacion.estado == True).all()
     schema = HabitacionSchema(many=True)
@@ -22,12 +22,12 @@ def buscar_por_precio(current_user):
 
 #Endpoint2: ver estado de todas las habitaciones en una fecha (Cliente)
 @busqueda_bp.route("/habitaciones/diario", methods=["GET"])
-@token_required("Cliente")
+@token_required("cliente")
 def estado_dia(current_user):
     try:
         fecha = datetime.strptime(request.args.get("fecha"), "%Y-%m-%d").date()
     except (TypeError, ValueError):
-        return jsonify({"error": "Parámetro 'fecha' inválido"}), 400
+        return jsonify({"mensaje": "Parámetro 'fecha' inválido"}), 400
 
     habitaciones = Habitacion.query.all()
     resultados = []
@@ -44,16 +44,16 @@ def estado_dia(current_user):
 
 #Endpoint3: buscar habitaciones disponibles en un rango de fechas (Cliente)
 @busqueda_bp.route("/habitaciones/disponibles", methods=["GET"])
-@token_required("Cliente")
+@token_required("cliente")
 def disponibles_rango(current_user):
     try:
         inicio = datetime.strptime(request.args.get("inicio"), "%Y-%m-%d")
         fin = datetime.strptime(request.args.get("fin"), "%Y-%m-%d")
     except (TypeError, ValueError):
-        return jsonify({"error": "Fechas inválidas"}), 400
+        return jsonify({"mensaje": "Fechas inválidas"}), 400
 
     if fin < inicio:
-        return jsonify({"error": "La fecha de fin no puede ser anterior a la de inicio"}), 400
+        return jsonify({"mensaje": "La fecha de fin no puede ser anterior a la de inicio"}), 400
 
     habitaciones = Habitacion.query.filter_by(estado=True).all()
     disponibles = []
