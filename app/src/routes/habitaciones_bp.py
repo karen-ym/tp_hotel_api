@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from src.models.habitacion import Habitacion
 from src.schemas.habitacion_schema import habitacion_schema, habitaciones_schema
+from src.security.security import token_required
 from marshmallow import ValidationError
 from dependencias import db
 
@@ -8,7 +9,6 @@ habitaciones_bp = Blueprint("habitaciones_bp", __name__)
 
 
 @habitaciones_bp.route("/habitaciones", methods=["GET"])
-#@token_requerido(categorias_permitidas=["empleado"])
 def listar():
     habitaciones = Habitacion.query.all()
 
@@ -16,6 +16,7 @@ def listar():
     return jsonify({"habitaciones": habitaciones_dump})
 
 @habitaciones_bp.route("/habitaciones", methods=["POST"])
+@token_required("Empleado")
 def crear():
     data = request.get_json()
     try:
@@ -28,6 +29,7 @@ def crear():
     return jsonify({"mensaje": "Se agrego correctamente"}), 201
 
 @habitaciones_bp.route("/habitaciones/<int:id>/precio", methods=["PUT"])
+@token_required("Empleado")
 def editar(id):
     habitacion = Habitacion.query.get(id)
     if not habitacion:
@@ -40,6 +42,7 @@ def editar(id):
     return jsonify({"mensaje": "Se actualizo correctamente"})
 
 @habitaciones_bp.route("/habitaciones/<int:id>", methods=["DELETE"])
+@token_required("Empleado")
 def desactivar(id):
     habitacion = Habitacion.query.get(id)
     if not habitacion:
@@ -49,6 +52,7 @@ def desactivar(id):
     return jsonify({"mensaje": "Desactivada"})
 
 @habitaciones_bp.route("/habitaciones/<int:id>", methods=['POST'])
+@token_required("Empleado")
 def activar(id):
     habitacion = Habitacion.query.get(id)
     if not habitacion:
@@ -59,6 +63,7 @@ def activar(id):
     return jsonify({"mensaje": "Activada"})
 
 @habitaciones_bp.route("/habitaciones/<int:id>", methods=['GET'])
+@token_required("Empleado")
 def info_habitacion(id):
     habitacion = Habitacion.query.get(id)
     if not habitacion:
