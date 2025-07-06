@@ -20,12 +20,12 @@ def buscar_por_precio(current_user):
     schema = HabitacionSchema(many=True)
     return jsonify(schema.dump(habitaciones)), 200
 
-#Endpoint2: ver estado de todas las habitaciones en una fecha (Cliente)
+#Endpoint2: ver estado de todas las habitaciones en una fecha (Empleado)
 @busqueda_bp.route("/habitaciones/diario", methods=["GET"])
 @token_required("empleado")
 def estado_dia(current_user):
     try:
-        fecha = datetime.strptime(request.args.get("fecha"), "%Y-%m-%d").date()
+        fecha = datetime.strptime(request.args.get("fecha"), "%d/%m/%Y").date()
     except (TypeError, ValueError):
         return jsonify({"mensaje": "Parámetro 'fecha' inválido"}), 400
 
@@ -33,7 +33,7 @@ def estado_dia(current_user):
     resultados = []
 
     for h in habitaciones:
-        reservada = Reserva.query.filter_by(habitacion_id=h.id, fecha=fecha).first() is not None
+        reservada = Reserva.query.filter_by(id=h.id, fecha=fecha).first() is not None
         resultados.append({
             "numero": h.numero,
             "precio": h.precio,
