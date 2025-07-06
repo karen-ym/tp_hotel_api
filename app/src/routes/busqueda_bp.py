@@ -1,0 +1,70 @@
+from flask import Blueprint, request, jsonify
+from datetime import datetime, timedelta
+from src.models.habitacion import Habitacion
+from src.models.reserva import Reserva
+from src.schemas.habitacion_schema import HabitacionSchema
+from src.security.security import token_required
+
+busqueda_bp = Blueprint("busqueda_bp", __name__)
+
+#Endpoint: buscar habitaciones con precio menor al valor dado (Cliente)
+@busqueda_bp.route("/habitaciones/filtrar", methods=["GET"])
+@token_required("Cliente")
+def buscar_por_precio(current_user):
+    try:
+        limite = float(request.args.get("precio"))
+    except (TypeError, ValueError):
+        return jsonify({"error": "Parámetro 'precio' inválido"}), 400
+
+    habitaciones = Habitacion.query.filter(Habitacion.precio <= limite, Habitacion.estado == True).all()
+    schema = HabitacionSchema(many=True)
+    return jsonify(schema.dump(habitaciones)), 200
+
+#Endpoint2: ver estado de todas las habitaciones en una fecha (Cliente)
+@busqueda_bp.route("/habitaciones/diario", methods=["GET"])
+@token_required("Cliente")
+def estado_dia(current_user):
+    try:
+        fecha = datetime.strptime(request.args.get("fecha"), "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        return jsonify({"error": "Parámetro 'fecha' inválido"}), 400
+
+    habitaciones = Habitacion.query.all()
+    resultados = []
+
+    for h in habitaciones:
+        reservada = Reserva.query.filter_by(habitacion_id=h.id, fecha=fecha).first() is not None
+        resultados.append({
+            "numero": h.numero,
+            "precio": h.precio,
+            "estado": "ocupada" if reservada else "disponible"
+        })
+
+    return jsonify(resultados), 200
+
+#Endpoint3: buscar habitaciones disponibles en un rango de fechas (Cliente)
+@busqueda_bp.route("/habitaciones/disponibles", methods=["GET"])
+@token_required("Cliente")
+def disponibles_rango(current_user):
+    try:
+        inicio = datetime.strptime(request.args.get("inicio"), "%Y-%m-%d")
+        fin = datetime.strptime(request.args.get("fin"), "%Y-%m-%d")
+    except (TypeError, ValueError):
+        return jsonify({"error": "Fechas inválidas"}), 400
+
+    if fin < inicio:
+        return jsonify({"error": "La fecha de fin no puede ser anterior a la de inicio"}), 400
+
+    habitaciones = Habitacion.query.filter_by(estado=True).all()
+    disponibles = []
+
+    for h in habitaciones:
+        ocupada = any(
+            Reserva.query.filter_by(habitacion_id=h.id, fecha=inicio + timedelta(days=i)).first()
+            for i in range((fin - inicio).days + 1)
+        )
+        if not ocupada:
+            disponibles.append(h)
+
+    schema = HabitacionSchema(many=True)
+    return jsonify(schema.dump(disponibles)), 200
