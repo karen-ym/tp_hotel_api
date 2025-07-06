@@ -11,7 +11,7 @@ class UserSchema(ma.Schema):
   categoria = fields.Str(
     required=True,
     validate=validate.OneOf(["cliente", "empleado"], error="La categoría debe ser 'Cliente' o 'Empleado'."),
-    error_messages={"required": "La categoría es obligatoria."}
+    error_messages={"required": "La categoria es obligatoria."}
   )
   clave1 = fields.Str(
     required=True,
@@ -19,7 +19,7 @@ class UserSchema(ma.Schema):
   )
   clave2 = fields.Str(
     required=True,
-    error_messages={"required": "La confirmación de la clave es obligatoria."}
+    error_messages={"required": "La confirmacion de la clave es obligatoria."}
   )
 
   class Meta:

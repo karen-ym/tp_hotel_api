@@ -35,7 +35,7 @@ def login():
         "categoria": user_db.role
     }), 200
   else:
-    return jsonify({"message": "Credenciales inválidas"}), 401
+    return jsonify({"message": "Credenciales invalidas"}), 401
 
 
 # ——— REGISTRO ———
@@ -54,7 +54,7 @@ def registro():
 
   user_existente = User.query.filter_by(username=datos_validos['usuario']).first()
   if user_existente:
-    return jsonify({"message": "El nombre de usuario ya está en uso"}), 400
+    return jsonify({"message": "El nombre de usuario ya esta en uso"}), 400
   
   hashed_password = hash_password(datos_validos['clave1']) # Esta definido en security.py
 
@@ -67,4 +67,4 @@ def registro():
   db.session.add(new_user)
   db.session.commit()
 
-  return jsonify({"message": "Usuario registrado con éxito"}), 201 # 201 = "Created"
+  return jsonify({"message": "Usuario registrado con exito"}), 201 # 201 = "Created"
