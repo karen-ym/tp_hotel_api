@@ -70,3 +70,29 @@ Este proyecto utiliza variables de entorno para manejar claves secretas.
 3.  Reemplazá el valor de `SECRET_KEY` por tu propia clave secreta.
 
 4.  El archivo `.env` está ignorado por Git, por lo que las claves secretas nunca se suben.
+
+## Ejecutar la Aplicación con Docker (Método para Entrega Final)
+
+Este es el método recomendado y obligatorio. Utiliza Gunicorn dentro de un contenedor Docker.
+
+**a. Descargar e iniciar Docker Desktop**
+
+**b. Configurar la Conexión a la Base de Datos**
+
+- Abre el archivo `app/app.py`.
+- Busca la línea de `SQLALCHEMY_DATABASE_URI`.
+- Reemplaza con tus credenciales de PostgreSQL.
+
+**c. Construir la Imagen Docker**
+En la terminal, desde la carpeta raíz del proyecto, ejecuta:
+
+```bash
+docker build -t hotel-api .
+```
+
+**d. Ejecutar el Contenedor**
+Una vez construida la imagen, inicia el contenedor:
+
+```bash
+docker run --name hotel-api-container -p 5000:5000 hotel-api
+```
