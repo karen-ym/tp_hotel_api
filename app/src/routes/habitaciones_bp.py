@@ -33,16 +33,20 @@ def crear(current_user):
 
 @habitaciones_bp.route("/habitaciones/<int:id>/precio", methods=["PUT"])
 @token_required("empleado")
-def editar(current_user,id):
+def editar(current_user, id):
     habitacion = Habitacion.query.get(id)
     if not habitacion:
-        return jsonify({"mensaje": "No encontrada"}), 404
+        return jsonify({"mensaje": "Habitación no encontrada"}), 404
+
     data = request.get_json()
-    for key in ["numero", "precio", "estado"]:
-        if key in data:
-            setattr(habitacion, key, data[key])
+    try:
+        datos_actualizados = habitacion_schema.load(data, instance=habitacion, partial=True)
+    except ValidationError as err:
+        return jsonify({"errores": err.messages}), 400
+
     db.session.commit()
-    return jsonify({"mensaje": "Se actualizo correctamente"})
+    
+    return jsonify(habitacion_schema.dump(datos_actualizados)), 200
 
 @habitaciones_bp.route("/habitaciones/<int:id>", methods=["DELETE"])
 @token_required("empleado")
