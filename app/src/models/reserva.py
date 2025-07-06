@@ -8,5 +8,6 @@ class Reserva(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     fecha = db.Column(db.Date, nullable=False)
 
-    habitacion = db.relationship("Habitacion", back_populates="reservas")
-    user = db.relationship("User", back_populates="reservas")
+    habitacion = db.relationship('Habitacion', back_populates='reservas')
+    user = db.relationship('User', back_populates='reservas')
+

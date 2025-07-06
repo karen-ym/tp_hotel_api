@@ -8,3 +8,5 @@ class User(db.Model):
   username = db.Column(db.String(80), unique=True, nullable=False)
   password = db.Column(db.String(255), nullable=False) # chequear si entra el hash aca
   role = db.Column(db.String(50), nullable=False)
+
+  reservas = db.relationship('Reserva', back_populates='user')
